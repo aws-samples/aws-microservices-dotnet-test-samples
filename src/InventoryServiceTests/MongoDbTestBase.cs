@@ -8,34 +8,35 @@ namespace InventoryServiceTests;
 public class MongoDbTestBase
 {
     private const string TestDatabaseName = "TestDb";
-    private MongoDbRunner? _mongoDb;
+    private const int MongoOutPort = 2222;
+    private static MongoDbRunner? _mongoDbRunner;
 
     [OneTimeSetUp]
-    public void InitMongo()
+    public static void InitMongo()
     {
-        _mongoDb = new MongoDbRunner();
+        _mongoDbRunner = new MongoDbRunner(MongoOutPort);
     }
 
     [OneTimeTearDown]
-    public void DisposeDb()
+    public static void DisposeDb()
     {
-        _mongoDb?.Dispose();
-        _mongoDb = null;
+        _mongoDbRunner?.Dispose();
+        _mongoDbRunner = null;
     }
      
     [TearDown]
     public void CleanDb()
     {
-        var client = new MongoClient(MongoDbRunner.ConnectionString);
+        var client = new MongoClient(_mongoDbRunner!.ConnectionString);
         client.DropDatabase(TestDatabaseName);
     }
 
-    protected static IInventoryDatabaseSettings GetDatabaseSettings()
+    protected IInventoryDatabaseSettings GetDatabaseSettings()
     {
         return new InventoryDatabaseSettings()
         {
             DatabaseName = TestDatabaseName,
-            ConnectionString = MongoDbRunner.ConnectionString,
+            ConnectionString = _mongoDbRunner!.ConnectionString,
         };
     }
 }

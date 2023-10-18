@@ -18,10 +18,10 @@ namespace ShoppingCartServiceAcceptanceTests.Drivers
         private const string InventoryServiceBaseUrlConfigKey = "ExternalServicesSettings:InventoryServiceBaseUrl";
         private const string OrderProcessingQueueNameConfigKey = "ExternalServicesSettings:OrderProcessingQueueName";
 
-        public TestServerDriver(InventoryServiceDriver inventoryServiceDriver) 
+        public TestServerDriver(InventoryServiceDriver inventoryServiceDriver, DynamoDbRunner dynamoDbRunner) 
             : base(
                 (DynamodbLocalModeConfigKey, "true"),
-                (DynamodbLocalServiceUrlConfigKey, $"http://localhost:{DynamoDbRunner.ExternalPort}"),
+                (DynamodbLocalServiceUrlConfigKey, $"http://localhost:{dynamoDbRunner.ExternalPort}"),
                 (InventoryServiceBaseUrlConfigKey, inventoryServiceDriver.MockProviderServiceBaseUri),
                 (OrderProcessingQueueNameConfigKey, SqsHooks.OrderProcessingQueueName))
         {

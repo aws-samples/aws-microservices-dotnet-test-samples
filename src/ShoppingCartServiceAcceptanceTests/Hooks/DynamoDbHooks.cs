@@ -1,5 +1,6 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
+using BoDi;
 using Common.TestUtils.DataAccess;
 
 namespace ShoppingCartServiceAcceptanceTests.Hooks
@@ -7,13 +8,20 @@ namespace ShoppingCartServiceAcceptanceTests.Hooks
     [Binding]
     public class DynamoDbHooks
     {
+        private readonly IObjectContainer _objectContainer;
         private const string ShoppingCartsTableName = "ShoppingCarts";
+        private const int ExternalPort = 8222;
         private static DynamoDbRunner? _dynamoDbRunner;
+
+        public DynamoDbHooks(IObjectContainer objectContainer)
+        {
+            _objectContainer = objectContainer;
+        }
         
         [BeforeTestRun]
         public static void BeforeTestRun()
         {
-            _dynamoDbRunner = new DynamoDbRunner();
+            _dynamoDbRunner = new DynamoDbRunner(ExternalPort);
         }
 
         [AfterTestRun]
@@ -26,6 +34,7 @@ namespace ShoppingCartServiceAcceptanceTests.Hooks
         [BeforeScenario]
         public void CreateTables()
         {
+            _objectContainer.RegisterInstanceAs(_dynamoDbRunner);
             var createTableRequest = new CreateTableRequest
             {
                 TableName = ShoppingCartsTableName,

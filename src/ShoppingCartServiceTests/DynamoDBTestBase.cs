@@ -8,13 +8,13 @@ namespace ShoppingCartServiceTests;
 public class DynamoDbTestBase
 {
     private const string ShoppingCartsTableName = "ShoppingCarts";
+    private const int ExternalPort = 8111;
     private DynamoDbRunner? _dynamoDbRunner;
-    
     
     [OneTimeSetUp]
     public void InitDb()
     {
-        _dynamoDbRunner = new DynamoDbRunner();
+        _dynamoDbRunner = new DynamoDbRunner(ExternalPort);
     } 
 
     [OneTimeTearDown]

@@ -9,7 +9,7 @@ public class TestServerDriverBase<TProgram> : IDisposable where TProgram : class
     private readonly WebApplicationFactory<TProgram> _application;
     private readonly JsonSerializerOptions _options;
     protected HttpClient Client { get; }
-
+    
     protected TestServerDriverBase(params (string key, string value)[] settings)
     {
         _application = new WebApplicationFactory<TProgram>()

@@ -5,15 +5,17 @@ namespace Common.TestUtils.DataAccess;
 
 public class DynamoDbRunner : IDisposable
 {
+    public int ExternalPort { get; }
     private const string ImageName = "dynamoDbLocal_test";
         
-    public const int ExternalPort = 8000;
     private Process? _process;
 
     public IAmazonDynamoDB Client { get; }
 
-    public DynamoDbRunner()
+    public DynamoDbRunner(int externalPort)
     {
+        ExternalPort = externalPort;
+
         _process = Process.Start("docker", $"run --name {ImageName} -p {ExternalPort}:8000 amazon/dynamodb-local");
 
         var clientConfig = new AmazonDynamoDBConfig

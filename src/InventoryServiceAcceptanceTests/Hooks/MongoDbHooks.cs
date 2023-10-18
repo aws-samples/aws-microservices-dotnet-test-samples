@@ -1,35 +1,40 @@
-using System;
-using System.Diagnostics;
-using Common.TestUtils;
+using BoDi;
 using Common.TestUtils.DataAccess;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Servers;
-using TechTalk.SpecFlow;
 
 namespace InventoryServiceAcceptanceTests.Hooks
 {
     [Binding]
     public class MongoDbHooks
     {
-        public static readonly string DatabaseName = "inventoryDb";
-        private static MongoDbRunner _mongo = null!;
+        private readonly IObjectContainer _objectContainer;
+        private const int MongoOutPort = 1111;
+        public const string DatabaseName = "inventoryDb";
+        private static MongoDbRunner _mongoDbRunner = null!;
 
+        public MongoDbHooks(IObjectContainer objectContainer)
+        {
+            _objectContainer = objectContainer;
+        }
         [BeforeTestRun]
         public static void BeforeTestRun()
         {
-            _mongo = new MongoDbRunner();
+            _mongoDbRunner = new MongoDbRunner(MongoOutPort);
+            
         }
 
         [AfterTestRun]
         public static void AfterTestRun()
         {
-            _mongo.Dispose();
+            _mongoDbRunner.Dispose();
         }
         
         [BeforeScenario]
         public void CleanupDatabase()
         {
-            var client = new MongoClient(MongoDbRunner.ConnectionString);
+            _objectContainer.RegisterInstanceAs(_mongoDbRunner);
+            
+            var client = new MongoClient(_mongoDbRunner.ConnectionString);
             client.DropDatabase(DatabaseName);
         }
     }

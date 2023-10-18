@@ -7,13 +7,13 @@ using InventoryServiceAcceptanceTests.Hooks;
 
 namespace InventoryServiceAcceptanceTests.Drivers
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
+    
     public class TestServerDriver : TestServerDriverBase<Program>
     {
         private const string InventoryBaseUri = "/api/Inventory";
 
-        public TestServerDriver() : base(
-            ("InventoryDatabaseSettings:ConnectionString", MongoDbRunner.ConnectionString),
+        public TestServerDriver(MongoDbRunner mongoDbRunner) : base(
+            ("InventoryDatabaseSettings:ConnectionString", mongoDbRunner.ConnectionString),
             ("InventoryDatabaseSettings:DatabaseName", MongoDbHooks.DatabaseName)
         )
         {

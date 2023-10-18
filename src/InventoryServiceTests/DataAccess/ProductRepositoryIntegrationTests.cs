@@ -9,12 +9,11 @@ public class ProductRepositoryIntegrationTests : MongoDbTestBase
 {
     private const string InvalidId = "507f191e810c19729de860ea";
     
-    private readonly IInventoryDatabaseSettings _databaseSettings = GetDatabaseSettings()!;
-    
+  
     [Test]
     public void FindAll_NoProductInDB_ReturnEmptyList()
     {
-        var target = new ProductRepository (_databaseSettings);
+        var target = new ProductRepository (GetDatabaseSettings());
 
         var actual = target.FindAll();
 
@@ -24,7 +23,7 @@ public class ProductRepositoryIntegrationTests : MongoDbTestBase
     [Test]
     public void FindAll_HasTwoProductsInDB_ReturnAllProducts()
     {
-        var target = new ProductRepository(_databaseSettings);
+        var target = new ProductRepository(GetDatabaseSettings());
 
         var product1 = new Product { Name = "name-1", Quantity = 1, Price = 10 };
         target.Create(product1);
@@ -41,7 +40,7 @@ public class ProductRepositoryIntegrationTests : MongoDbTestBase
     [Test]
     public void GetById_hasThreeCartsInDB_returnReturnOnlyCartWithCorrectId()
     {
-        var target = new ProductRepository(_databaseSettings);
+        var target = new ProductRepository(GetDatabaseSettings());
 
         var product1 = new Product { Name = "name-1", Quantity = 1, Price = 10 };
         target.Create(product1);
@@ -60,7 +59,7 @@ public class ProductRepositoryIntegrationTests : MongoDbTestBase
     [Test]
     public void GetById_CartNotFound_ReturnNull()
     {
-        var target = new ProductRepository(_databaseSettings);
+        var target = new ProductRepository(GetDatabaseSettings());
 
         var product1 = new Product { Name = "name-1", Quantity = 1, Price = 10 };
         target.Create(product1);
@@ -79,7 +78,7 @@ public class ProductRepositoryIntegrationTests : MongoDbTestBase
     [Test]
     public void Update_CartNotFound_DoNotFail()
     {
-        var target = new ProductRepository(_databaseSettings);
+        var target = new ProductRepository(GetDatabaseSettings());
         var product1 = new Product { Name = "name-1", Quantity = 1, Price = 10 };
 
         target.Update(InvalidId, product1);
@@ -88,7 +87,7 @@ public class ProductRepositoryIntegrationTests : MongoDbTestBase
     [Test]
     public void Update_CartFound_UpdateValue()
     {
-        var target = new ProductRepository(_databaseSettings);
+        var target = new ProductRepository(GetDatabaseSettings());
         var product1 = new Product { Name = "name-1", Quantity = 1, Price = 10 };
         target.Create(product1);
         product1.Quantity = 100;

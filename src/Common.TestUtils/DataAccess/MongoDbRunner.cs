@@ -6,16 +6,18 @@ namespace Common.TestUtils.DataAccess;
 
 public class MongoDbRunner : IDisposable
 {
+    public int MongoOutPort { get; }
     private const string ImageName = "mongo_test";
     private const string MongoInPort = "27017";
-    private const string MongoOutPort = "1111";
     private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(60);
     
     private static Process? _process;
-    public static string ConnectionString { get; } = $"mongodb://localhost:{MongoOutPort}";
 
-    public MongoDbRunner()
+    public string ConnectionString => $"mongodb://localhost:{MongoOutPort}";
+
+    public MongoDbRunner(int mongoOutPort)
     {
+        MongoOutPort = mongoOutPort;
         _process = Process.Start("docker", $"run --name {ImageName} -p {MongoOutPort}:{MongoInPort} mongo");
         var started = WaitForMongoDbConnection(ConnectionString, "admin");
         if (!started)
