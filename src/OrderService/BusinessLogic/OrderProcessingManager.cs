@@ -9,21 +9,20 @@ public class OrderProcessingManager
     private readonly IInventoryRepository _inventoryRepository;
     private readonly IOrderRepository _orderRepository;
 
-    public OrderProcessingManager(IIncomingOrderRepository incomingOrderRepository, IInventoryRepository inventoryRepository, IOrderRepository orderRepository)
+    public OrderProcessingManager(IIncomingOrderRepository incomingOrderRepository,
+        IInventoryRepository inventoryRepository, IOrderRepository orderRepository)
     {
         _incomingOrderRepository = incomingOrderRepository;
         _inventoryRepository = inventoryRepository;
         _orderRepository = orderRepository;
     }
+
     public async Task ProcessNextMessage()
     {
         var createOrderMessage = await _incomingOrderRepository.GetNextOrderAsync();
 
-        if (createOrderMessage is null)
-        {
-            return;
-        }
-        
+        if (createOrderMessage is null) return;
+
         var orderItems = new List<OrderItem>();
 
         foreach (var productId in createOrderMessage.Items)
@@ -33,12 +32,12 @@ public class OrderProcessingManager
 
             orderItems.Add(new OrderItem(productId, itemStatus));
         }
-        
+
         var order = new Order(
-            createOrderMessage.CustomerName, 
+            createOrderMessage.CustomerName,
             createOrderMessage.ShippingAddress,
             orderItems);
-        
+
         await _orderRepository.SaveOrderAsync(order);
     }
 }

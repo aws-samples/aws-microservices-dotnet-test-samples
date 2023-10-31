@@ -69,19 +69,19 @@ public class ShoppingCartControllerUnitTests : TestBase<MappingProfile>
         Assert.That(actual, Is.EqualTo(expected));
     }
 
-[Test]
-public async Task FindById_CartNotFound_ReturnNotFound()
-{
-    var fakeShoppingCartRepository = AutoFake.Resolve<IShoppingCartRepository>();
-    A.CallTo(() => fakeShoppingCartRepository.FindByIdAsync(A<string>._))
-        .Returns(Task.FromResult<ShoppingCartDo?>(null));
+    [Test]
+    public async Task FindById_CartNotFound_ReturnNotFound()
+    {
+        var fakeShoppingCartRepository = AutoFake.Resolve<IShoppingCartRepository>();
+        A.CallTo(() => fakeShoppingCartRepository.FindByIdAsync(A<string>._))
+            .Returns(Task.FromResult<ShoppingCartDo?>(null));
 
-    var target = AutoFake.Resolve<ShoppingCartController>();
+        var target = AutoFake.Resolve<ShoppingCartController>();
 
-    var actual = await target.FindById("cart-1");
+        var actual = await target.FindById("cart-1");
 
-    Assert.That(actual.Result, Is.TypeOf<NotFoundResult>());
-}
+        Assert.That(actual.Result, Is.TypeOf<NotFoundResult>());
+    }
 
     [Test]
     public async Task FindById_CartFound_ReturnCart()

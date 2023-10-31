@@ -1,4 +1,3 @@
-
 using AutoMapper;
 using ShoppingCartService.BusinessLogic.Models;
 using ShoppingCartService.Controllers.Models;
@@ -9,13 +8,13 @@ namespace ShoppingCartService.BusinessLogic;
 
 public class ShoppingCartManager
 {
-    private readonly IMapper _mapper;
-    private readonly IShoppingCartRepository _shoppingCartRepository;
     private readonly IInventoryRepository _inventoryRepository;
+    private readonly IMapper _mapper;
     private readonly IOrderServiceNotifications _orderServiceNotifications;
+    private readonly IShoppingCartRepository _shoppingCartRepository;
 
     public ShoppingCartManager(
-        IShoppingCartRepository shoppingCartRepository, 
+        IShoppingCartRepository shoppingCartRepository,
         IInventoryRepository inventoryRepository,
         IOrderServiceNotifications orderServiceNotifications,
         IMapper mapper)
@@ -25,6 +24,7 @@ public class ShoppingCartManager
         _shoppingCartRepository = shoppingCartRepository;
         _inventoryRepository = inventoryRepository;
     }
+
     public async Task<ShoppingCartDto> CreateAsync(CreateShoppingCartDto createCart)
     {
         var shippingAddress = _mapper.Map<ShippingAddress>(createCart.ShippingAddress);
@@ -37,10 +37,7 @@ public class ShoppingCartManager
     public async Task<ShoppingCartDto> FindById(string shoppingCartId)
     {
         var shoppingCartDo = await _shoppingCartRepository.FindByIdAsync(shoppingCartId);
-        if (shoppingCartDo is null)
-        {
-            throw new ShoppingCartNotFoundException("Id not found");
-        }
+        if (shoppingCartDo is null) throw new ShoppingCartNotFoundException("Id not found");
 
         return _mapper.Map<ShoppingCartDto>(shoppingCartDo);
     }
@@ -48,16 +45,10 @@ public class ShoppingCartManager
     public async Task<ShoppingCartDto> AddItemToCart(string shoppingCartId, string productId)
     {
         var productExist = await _inventoryRepository.ProductExist(productId);
-        if (productExist is false)
-        {
-            throw new ProductNotFoundException("Product not found");
-        }
+        if (productExist is false) throw new ProductNotFoundException("Product not found");
 
         var shoppingCartDo = await _shoppingCartRepository.AddItemToCart(shoppingCartId, productId);
-        if (shoppingCartDo is null)
-        {
-            throw new ShoppingCartNotFoundException("Shopping cart not found");
-        }
+        if (shoppingCartDo is null) throw new ShoppingCartNotFoundException("Shopping cart not found");
 
         return _mapper.Map<ShoppingCartDto>(shoppingCartDo);
     }
@@ -65,17 +56,12 @@ public class ShoppingCartManager
     public async Task CheckoutAsync(string shoppingCartId)
     {
         var shoppingCartDo = await _shoppingCartRepository.FindByIdAsync(shoppingCartId);
-        if (shoppingCartDo is null)
-        {
-            throw new ShoppingCartNotFoundException("Shopping cart not found");
-        }
+        if (shoppingCartDo is null) throw new ShoppingCartNotFoundException("Shopping cart not found");
 
         if (shoppingCartDo.Items.Any() is false)
-        {
             throw new NoItemsInShoppingCartException(
                 $"Cannot send order, shopping cart {shoppingCartId} does not have any items");
-        }
-        
+
         await _orderServiceNotifications.SendOrder(shoppingCartDo.Items, shoppingCartDo.ShippingAddress);
     }
 }

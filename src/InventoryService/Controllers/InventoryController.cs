@@ -38,14 +38,13 @@ public class InventoryController : ControllerBase
         try
         {
             findById = _inventoryManager.FindById(id);
-          
         }
         catch (ProductNotFoundException exception)
         {
             _logger.LogDebug("Product {Id}, not found - {ExMessage}", id, exception.Message);
             return NotFound();
         }
-        
+
         return findById;
     }
 

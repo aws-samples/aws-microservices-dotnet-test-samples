@@ -17,4 +17,4 @@
         Given a user creates a new shopping cart
         And the product "prod-1" is not in the inventory
         When a user adds item "prod-1" to shopping cart
-        Then then return not found 
+        Then then return not found

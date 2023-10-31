@@ -1,21 +1,31 @@
-using System.Diagnostics;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using Common.TestUtils.DataAccess;
+using NUnit.Framework;
 
-namespace ShoppingCartServiceTests;
+namespace Common.TestUtils.TestBaseClasses;
 
 public class DynamoDbTestBase
 {
     private const string ShoppingCartsTableName = "ShoppingCarts";
     private const int ExternalPort = 8111;
     private DynamoDbRunner? _dynamoDbRunner;
-    
+
+    protected IAmazonDynamoDB Client
+    {
+        get
+        {
+            if (_dynamoDbRunner == null) Assert.Fail(nameof(_dynamoDbRunner) + " != null");
+
+            return _dynamoDbRunner!.Client;
+        }
+    }
+
     [OneTimeSetUp]
     public void InitDb()
     {
         _dynamoDbRunner = new DynamoDbRunner(ExternalPort);
-    } 
+    }
 
     [OneTimeTearDown]
     public void DisposeDb()
@@ -38,7 +48,7 @@ public class DynamoDbTestBase
             {
                 new("Id", KeyType.HASH)
             },
-            ProvisionedThroughput = new ProvisionedThroughput{ReadCapacityUnits = 1, WriteCapacityUnits = 1}
+            ProvisionedThroughput = new ProvisionedThroughput { ReadCapacityUnits = 1, WriteCapacityUnits = 1 }
         };
         _dynamoDbRunner?.Client.CreateTableAsync(createTableRequest).Wait();
     }
@@ -47,18 +57,5 @@ public class DynamoDbTestBase
     public void DropTables()
     {
         _dynamoDbRunner?.Client.DeleteTableAsync(ShoppingCartsTableName).Wait();
-    }
-    
-    protected IAmazonDynamoDB Client
-    {
-        get
-        {
-            if (_dynamoDbRunner == null)
-            {
-                Assert.Fail(nameof(_dynamoDbRunner) + " != null");
-            }
-           
-            return _dynamoDbRunner!.Client;
-        }
     }
 }

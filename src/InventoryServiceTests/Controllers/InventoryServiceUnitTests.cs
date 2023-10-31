@@ -85,8 +85,8 @@ public class InventoryServiceUnitTests : TestBase<MappingProfile>
         var fakeInventoryRepository = AutoFake.Resolve<IProductRepository>();
         A.CallTo(() => fakeInventoryRepository.FindAll()).Returns(new List<Product>
         {
-            new Product { Id = "product-1", Name = "product 1", Quantity = 1, Price = 10},
-            new Product { Id = "product-2", Name = "product 2", Quantity = 2, Price = 20}
+            new() { Id = "product-1", Name = "product 1", Quantity = 1, Price = 10 },
+            new() { Id = "product-2", Name = "product 2", Quantity = 2, Price = 20 }
         });
 
         var target = AutoFake.Resolve<InventoryController>();
@@ -95,13 +95,13 @@ public class InventoryServiceUnitTests : TestBase<MappingProfile>
 
         var expected = new List<ProductDto>
         {
-            new("product-1", "product 1", 10,1),
+            new("product-1", "product 1", 10, 1),
             new("product-2", "product 2", 20, 2)
         };
 
         Assert.That(result, Is.EqualTo(expected));
     }
-    
+
     [Test]
     public void UpdateQuantity_ProductNotFound_ReturnNotFound()
     {
@@ -124,7 +124,7 @@ public class InventoryServiceUnitTests : TestBase<MappingProfile>
         var target = AutoFake.Resolve<InventoryController>();
         target.UpdateQuantity("product-1", 2);
 
-        var expected = new Product { Id = "product-1", Name = "name", Quantity = 2, Price = 10};
+        var expected = new Product { Id = "product-1", Name = "name", Quantity = 2, Price = 10 };
 
         A.CallTo(() => fakeInventoryRepository.Update("product-1", expected))
             .MustHaveHappened();
@@ -135,7 +135,7 @@ public class InventoryServiceUnitTests : TestBase<MappingProfile>
     {
         var fakeInventoryRepository = AutoFake.Resolve<IProductRepository>();
         A.CallTo(() => fakeInventoryRepository.FindById("product-1"))
-            .Returns(new Product { Id = "product-1", Name = "name", Quantity = 1, Price = 10});
+            .Returns(new Product { Id = "product-1", Name = "name", Quantity = 1, Price = 10 });
 
         var target = AutoFake.Resolve<InventoryController>();
         var result = target.UpdateQuantity("product-1", 2);

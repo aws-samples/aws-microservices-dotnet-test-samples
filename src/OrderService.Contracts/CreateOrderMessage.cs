@@ -10,14 +10,15 @@ public class CreateOrderMessage
 
     protected bool Equals(CreateOrderMessage other)
     {
-        return Items.SequenceEqual(other.Items) && CustomerName == other.CustomerName && ShippingAddress == other.ShippingAddress;
+        return Items.SequenceEqual(other.Items) && CustomerName == other.CustomerName &&
+               ShippingAddress == other.ShippingAddress;
     }
 
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (obj.GetType() != GetType()) return false;
         return Equals((CreateOrderMessage)obj);
     }
 
@@ -28,6 +29,7 @@ public class CreateOrderMessage
 
     public override string ToString()
     {
-        return $"{nameof(Items)}: {Items}, {nameof(CustomerName)}: {CustomerName}, {nameof(ShippingAddress)}: {ShippingAddress}";
+        return
+            $"{nameof(Items)}: {Items}, {nameof(CustomerName)}: {CustomerName}, {nameof(ShippingAddress)}: {ShippingAddress}";
     }
 }

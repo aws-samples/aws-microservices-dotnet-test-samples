@@ -38,5 +38,7 @@ app.Run();
 
 // Enable using Program in Acceptance tests
 #pragma warning disable CA1050
-public partial class Program{}
+public partial class Program
+{
+}
 #pragma warning restore CA1050

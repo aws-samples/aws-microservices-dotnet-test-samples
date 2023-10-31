@@ -6,14 +6,11 @@ namespace Common.TestUtils.DataAccess;
 
 public class MongoDbRunner : IDisposable
 {
-    public int MongoOutPort { get; }
     private const string ImageName = "mongo_test";
     private const string MongoInPort = "27017";
     private static readonly TimeSpan TestTimeout = TimeSpan.FromSeconds(60);
-    
-    private static Process? _process;
 
-    public string ConnectionString => $"mongodb://localhost:{MongoOutPort}";
+    private static Process? _process;
 
     public MongoDbRunner(int mongoOutPort)
     {
@@ -25,9 +22,13 @@ public class MongoDbRunner : IDisposable
                 $"Startup failed, could not get MongoDB connection after trying for '{TestTimeout}'");
     }
 
+    public int MongoOutPort { get; }
+
+    public string ConnectionString => $"mongodb://localhost:{MongoOutPort}";
+
     public void Dispose()
     {
-         _process?.Dispose();
+        _process?.Dispose();
         _process = null;
 
         var processStop = Process.Start("docker", $"stop {ImageName}");
@@ -35,7 +36,7 @@ public class MongoDbRunner : IDisposable
         var processRm = Process.Start("docker", $"rm {ImageName}");
         processRm.WaitForExit();
     }
-    
+
     private static bool WaitForMongoDbConnection(string connectionString, string dbName)
     {
         Console.Out.WriteLine("Waiting for Mongo to respond");
@@ -62,5 +63,4 @@ public class MongoDbRunner : IDisposable
         probeTask.Wait();
         return probeTask.Result;
     }
-
 }

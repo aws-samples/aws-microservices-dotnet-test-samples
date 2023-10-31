@@ -20,7 +20,7 @@ public static class AssertionsExtensions
         IEnumerable<TExpected> expectedAnonymous)
     {
         var expectedType = expectedAnonymous.First()!.GetType();
-  
+
         var transformedResult = new List<TExpected>();
         foreach (var item in actual)
         {
@@ -45,10 +45,7 @@ public static class AssertionsExtensions
     {
         var actualProperty = instanceType.GetProperty(parameterInfo.Name!);
         var actualPropertyValue = actualProperty!.GetValue(instance);
-        if (!parameterInfo.ParameterType.IsAnonymousType())
-        {
-            return actualPropertyValue!;
-        }
+        if (!parameterInfo.ParameterType.IsAnonymousType()) return actualPropertyValue!;
 
         return TransformRealToAnonymous(actualPropertyValue!, actualProperty.PropertyType, parameterInfo.ParameterType);
     }

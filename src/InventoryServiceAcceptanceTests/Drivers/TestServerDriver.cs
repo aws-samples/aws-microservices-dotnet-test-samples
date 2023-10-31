@@ -5,61 +5,59 @@ using Common.TestUtils.Drivers;
 using InventoryService.Contracts.Models;
 using InventoryServiceAcceptanceTests.Hooks;
 
-namespace InventoryServiceAcceptanceTests.Drivers
+namespace InventoryServiceAcceptanceTests.Drivers;
+
+public class TestServerDriver : TestServerDriverBase<Program>
 {
-    
-    public class TestServerDriver : TestServerDriverBase<Program>
+    private const string InventoryBaseUri = "/api/Inventory";
+
+    public TestServerDriver(MongoDbRunner mongoDbRunner) : base(
+        ("InventoryDatabaseSettings:ConnectionString", mongoDbRunner.ConnectionString),
+        ("InventoryDatabaseSettings:DatabaseName", MongoDbHooks.DatabaseName)
+    )
     {
-        private const string InventoryBaseUri = "/api/Inventory";
+    }
 
-        public TestServerDriver(MongoDbRunner mongoDbRunner) : base(
-            ("InventoryDatabaseSettings:ConnectionString", mongoDbRunner.ConnectionString),
-            ("InventoryDatabaseSettings:DatabaseName", MongoDbHooks.DatabaseName)
-        )
-        {
-        }
+    public async Task<string> AddProductToInventory(CreateProductDto createProductDto)
+    {
+        var serializeObject = JsonSerializer.Serialize(createProductDto);
+        var stringContent = new StringContent(serializeObject, Encoding.UTF8, "application/json");
 
-        public async Task<string> AddProductToInventory(CreateProductDto createProductDto)
-        {
-            var serializeObject = JsonSerializer.Serialize(createProductDto);
-            var stringContent = new StringContent(serializeObject, Encoding.UTF8, "application/json");
+        var response = await Client.PostAsync(InventoryBaseUri, stringContent);
 
-            var response = await Client.PostAsync(InventoryBaseUri, stringContent);
+        var productDto = await GetResultFromResponse<ProductDto>(response);
 
-            var productDto = await GetResultFromResponse<ProductDto>(response);
+        return productDto.Id;
+    }
 
-            return productDto.Id;
-        }
+    public async Task<ProductDto> FindById(string id)
+    {
+        var response = await Client.GetAsync($"{InventoryBaseUri}/{id}");
 
-        public async Task<ProductDto> FindById(string id)
-        {
-            var response = await Client.GetAsync($"{InventoryBaseUri}/{id}");
+        return await GetResultFromResponse<ProductDto>(response);
+    }
 
-            return await GetResultFromResponse<ProductDto>(response);
-        }
+    public async Task<IEnumerable<ProductDto>> GetAllProducts()
+    {
+        var response = await Client.GetAsync(InventoryBaseUri);
 
-        public async Task<IEnumerable<ProductDto>> GetAllProducts()
-        {
-            var response = await Client.GetAsync(InventoryBaseUri);
+        return await GetResultFromResponse<List<ProductDto>>(response);
+    }
 
-            return await GetResultFromResponse<List<ProductDto>>(response);
-        }
+    public async Task DeleteProduct(string id)
+    {
+        var response = await Client.DeleteAsync($"{InventoryBaseUri}/{id}");
 
-        public async Task DeleteProduct(string id)
-        {
-            var response = await Client.DeleteAsync($"{InventoryBaseUri}/{id}");
+        VerifyResponse(response);
+    }
 
-            VerifyResponse(response);
-        }
+    public async Task UpdateQuantity(string id, int quantity)
+    {
+        var serializeObject = JsonSerializer.Serialize(quantity);
+        var stringContent = new StringContent(serializeObject, Encoding.UTF8, "application/json");
 
-        public async Task UpdateQuantity(string id, int quantity)
-        {
-            var serializeObject = JsonSerializer.Serialize(quantity);
-            var stringContent = new StringContent(serializeObject, Encoding.UTF8, "application/json");
+        var response = await Client.PutAsync($"{InventoryBaseUri}/{id}/quantity", stringContent);
 
-            var response = await Client.PutAsync($"{InventoryBaseUri}/{id}/quantity", stringContent);
-
-            VerifyResponse(response);
-        }
+        VerifyResponse(response);
     }
 }

@@ -1,11 +1,10 @@
 using System.Text.Json;
-using Amazon;
 using Amazon.SQS;
-using Amazon.SQS.Model;
 using Common.TestUtils.DataAccess;
 using Common.TestUtils.Extensions;
+using NUnit.Framework;
 
-namespace ShoppingCartServiceTests;
+namespace Common.TestUtils.TestBaseClasses;
 
 public class SqsTestBase
 {
@@ -13,8 +12,8 @@ public class SqsTestBase
     private SqsTestRunner? _sqsTestRunner;
 
     protected IAmazonSQS SqsClient => _sqsTestRunner!.SqsClient;
-    protected string QueueName { get; set; } = null!;
-    
+    protected string QueueName { get; private set; } = null!;
+
     [OneTimeSetUp]
     public void CreateQueue()
     {
@@ -25,12 +24,21 @@ public class SqsTestBase
     [OneTimeTearDown]
     public void DeleteQueue()
     {
-       _sqsTestRunner?.Dispose();
-       _sqsTestRunner = null;
+        _sqsTestRunner?.Dispose();
+        _sqsTestRunner = null;
     }
-    
+
     protected async Task<T> GetNextMessage<T>()
     {
         return await SqsClient.GetNextMessage<T>(_sqsTestRunner!.QueueUrl);
+    }
+
+    protected async Task SendMessageToQueue<T>(T content)
+    {
+        var getQueueUrlResponse = await SqsClient.GetQueueUrlAsync(QueueName);
+
+        var messageText = JsonSerializer.Serialize(content);
+
+        await SqsClient.SendMessageAsync(getQueueUrlResponse.QueueUrl, messageText);
     }
 }

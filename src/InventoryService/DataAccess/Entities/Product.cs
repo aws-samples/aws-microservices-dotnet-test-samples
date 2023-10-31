@@ -10,9 +10,9 @@ public class Product
     public string Id { get; set; } = null!;
 
     public string Name { get; set; } = null!;
-    
+
     public double Price { get; set; }
-    
+
     public uint Quantity { get; set; }
 
     protected bool Equals(Product other)
@@ -24,7 +24,7 @@ public class Product
     {
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (obj.GetType() != GetType()) return false;
         return Equals((Product)obj);
     }
 

@@ -13,6 +13,7 @@ public class ShoppingCartRepository : IShoppingCartRepository
     {
         _context = new DynamoDBContext(amazonDynamoDb);
     }
+
     public async Task<ShoppingCartDo> CreateAsync(ShippingAddress shippingAddress)
     {
         var shoppingCartDo = new ShoppingCartDo
@@ -21,7 +22,7 @@ public class ShoppingCartRepository : IShoppingCartRepository
             ShippingAddress = shippingAddress
         };
         await _context.SaveAsync(shoppingCartDo);
-       
+
         return shoppingCartDo;
     }
 
@@ -35,11 +36,11 @@ public class ShoppingCartRepository : IShoppingCartRepository
         var shoppingCartDo = await _context.LoadAsync<ShoppingCartDo>(shoppingCartId);
 
         if (shoppingCartDo is null) return null;
-        
+
         shoppingCartDo.Items.Add(productId);
 
-        await _context.SaveAsync<ShoppingCartDo>(shoppingCartDo);
-        
+        await _context.SaveAsync(shoppingCartDo);
+
         return shoppingCartDo;
     }
 }

@@ -12,17 +12,13 @@ var dynamoDbConfig = builder.Configuration.GetSection("DynamoDb");
 var runLocalDynamoDb = dynamoDbConfig.GetValue<bool>("LocalMode");
 
 if (runLocalDynamoDb)
-{
     builder.Services.AddSingleton<IAmazonDynamoDB>(_ =>
     {
         var clientConfig = new AmazonDynamoDBConfig { ServiceURL = dynamoDbConfig.GetValue<string>("LocalServiceUrl") };
         return new AmazonDynamoDBClient(clientConfig);
     });
-}
 else
-{
     builder.Services.AddAWSService<IAmazonDynamoDB>();
-}
 
 builder.Services.AddAWSService<IAmazonSQS>();
 

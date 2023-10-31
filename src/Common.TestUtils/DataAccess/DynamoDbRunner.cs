@@ -5,12 +5,9 @@ namespace Common.TestUtils.DataAccess;
 
 public class DynamoDbRunner : IDisposable
 {
-    public int ExternalPort { get; }
     private const string ImageName = "dynamoDbLocal_test";
-        
-    private Process? _process;
 
-    public IAmazonDynamoDB Client { get; }
+    private Process? _process;
 
     public DynamoDbRunner(int externalPort)
     {
@@ -25,7 +22,11 @@ public class DynamoDbRunner : IDisposable
 
         Client = new AmazonDynamoDBClient(clientConfig);
     }
-    
+
+    public int ExternalPort { get; }
+
+    public IAmazonDynamoDB Client { get; }
+
     public void Dispose()
     {
         _process?.Dispose();

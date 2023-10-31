@@ -4,7 +4,7 @@ using InventoryService.DataAccess.Entities;
 
 namespace InventoryService.Mapping;
 
-public class MappingProfile: Profile
+public class MappingProfile : Profile
 {
     public MappingProfile()
     {

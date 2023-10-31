@@ -8,7 +8,7 @@ public class SqsHooks
     public static readonly string OrderProcessingQueueName = $"OrderProcessingQueue-{Guid.NewGuid().ToString()}";
 
     private static SqsTestRunner? _sqsTestRunner;
-    
+
     [BeforeTestRun]
     public static void BeforeTestRun()
     {

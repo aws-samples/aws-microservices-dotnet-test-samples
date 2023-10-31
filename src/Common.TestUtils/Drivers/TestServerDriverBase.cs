@@ -8,27 +8,25 @@ public class TestServerDriverBase<TProgram> : IDisposable where TProgram : class
 {
     private readonly WebApplicationFactory<TProgram> _application;
     private readonly JsonSerializerOptions _options;
-    protected HttpClient Client { get; }
-    
+
     protected TestServerDriverBase(params (string key, string value)[] settings)
     {
         _application = new WebApplicationFactory<TProgram>()
             .WithWebHostBuilder(builder =>
             {
-                foreach (var (key, value) in settings)
-                {
-                    builder.UseSetting(key, value);
-                }
+                foreach (var (key, value) in settings) builder.UseSetting(key, value);
             });
-        
+
 
         Client = _application.CreateClient();
-        
+
         _options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
         };
     }
+
+    protected HttpClient Client { get; }
 
     public void Dispose()
     {
@@ -43,12 +41,12 @@ public class TestServerDriverBase<TProgram> : IDisposable where TProgram : class
         var responseJson = await response.Content.ReadAsStringAsync();
 
         var result = JsonSerializer.Deserialize<T>(responseJson, _options);
-        
+
         Assert.That(result, Is.Not.Null);
-        
+
         return result!;
     }
-    
+
     protected static void VerifyResponse(HttpResponseMessage response)
     {
         Assert.True(response.IsSuccessStatusCode, $"got: {response.StatusCode}");

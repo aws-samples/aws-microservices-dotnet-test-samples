@@ -1,22 +1,22 @@
-using InventoryService.Contracts.Models;
 using System.Text.Json;
+using InventoryService.Contracts.Models;
 using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Server;
 
 namespace ShoppingCartServiceAcceptanceTests.Drivers;
 
-public class InventoryServiceDriver: IDisposable
+public class InventoryServiceDriver : IDisposable
 {
     private readonly WireMockServer _server = WireMockServer.Start();
-    
+
     public string MockProviderServiceBaseUri => _server.Urls[0];
 
     public void Dispose()
     {
         _server.Dispose();
     }
-    
+
     public void AddProducts(IEnumerable<ProductDto> products)
     {
         foreach (var product in products)

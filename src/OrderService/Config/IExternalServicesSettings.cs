@@ -1,9 +1,8 @@
-﻿namespace OrderService.Config
+﻿namespace OrderService.Config;
+
+public interface IExternalServicesSettings
 {
-    public interface IExternalServicesSettings
-    {
-        string? InventoryServiceBaseUrl { get; }
-        
-        string? OrderProcessingQueueName { get; }
-    }
+    string? InventoryServiceBaseUrl { get; }
+
+    string? OrderProcessingQueueName { get; }
 }

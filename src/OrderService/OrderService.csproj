@@ -9,22 +9,22 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AWSSDK.SQS" Version="3.7.200.64" />
+        <PackageReference Include="AWSSDK.SQS" Version="3.7.200.64"/>
         <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1"/>
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\.dockerignore">
-        <Link>.dockerignore</Link>
-      </Content>
+        <Content Include="..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Mapping\" />
+        <Folder Include="Mapping\"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Common.Sqs\Common.Sqs.csproj" />
-      <ProjectReference Include="..\OrderService.Contracts\OrderService.Contracts.csproj" />
+        <ProjectReference Include="..\Common.Sqs\Common.Sqs.csproj"/>
+        <ProjectReference Include="..\OrderService.Contracts\OrderService.Contracts.csproj"/>
     </ItemGroup>
 </Project>

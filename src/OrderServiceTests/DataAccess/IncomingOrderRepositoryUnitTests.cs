@@ -21,25 +21,25 @@ public class IncomingOrderRepositoryUnitTests
             OrderProcessingQueueName = orderProcessingQueueName
         };
 
-        var fakeLogger = new Logger<IncomingOrderRepository>(new NullLoggerFactory());
-        var target = new IncomingOrderRepository(fakeSqsClient, settings, fakeLogger);
+        var logger = new Logger<IncomingOrderRepository>(new NullLoggerFactory());
+        var target = new IncomingOrderRepository(fakeSqsClient, settings, logger);
         return target;
     }
-    
+
     [Test]
     public async Task GetNextOrderAsync_CallSqsUsingLogPolling()
     {
         const string orderProcessingQueueName = "test-queue";
         const string queueUrl = "http://test-queue-url";
-        
+
         var fakeSqsClient = A.Fake<IAmazonSQS>();
-        
+
         A.CallTo(() => fakeSqsClient.GetQueueUrlAsync(orderProcessingQueueName, A<CancellationToken>._))
             .Returns(Task.FromResult(new GetQueueUrlResponse
             {
                 QueueUrl = queueUrl
             }));
-        
+
         var target = CreateIncomingOrderRepository(orderProcessingQueueName, fakeSqsClient);
 
         ReceiveMessageRequest? actual = null;
@@ -47,7 +47,7 @@ public class IncomingOrderRepositoryUnitTests
         A.CallTo(() =>
                 fakeSqsClient.ReceiveMessageAsync(A<ReceiveMessageRequest>._, A<CancellationToken>._))
             .Invokes(call => actual = call.Arguments.Get<ReceiveMessageRequest>(0));
-            
+
         await target.GetNextOrderAsync();
 
         Assert.That(actual, Is.Not.Null);
@@ -60,9 +60,9 @@ public class IncomingOrderRepositoryUnitTests
     {
         const string orderProcessingQueueName = "test-queue";
         const string queueUrl = "http://test-queue-url";
-        
+
         var fakeSqsClient = A.Fake<IAmazonSQS>();
-        
+
         A.CallTo(() => fakeSqsClient.GetQueueUrlAsync(orderProcessingQueueName, A<CancellationToken>._))
             .Returns(Task.FromResult(new GetQueueUrlResponse
             {
@@ -73,30 +73,33 @@ public class IncomingOrderRepositoryUnitTests
         A.CallTo(() => fakeSqsClient.ReceiveMessageAsync(A<ReceiveMessageRequest>._, A<CancellationToken>._))
             .Returns(Task.FromResult(new ReceiveMessageResponse
             {
-                Messages = new List<Message>{ new()
+                Messages = new List<Message>
                 {
-                    MessageId = "message-1",
-                    ReceiptHandle = "handle-1",
-                    Body = message
-                } }
+                    new()
+                    {
+                        MessageId = "message-1",
+                        ReceiptHandle = "handle-1",
+                        Body = message
+                    }
+                }
             }));
-        
+
         var target = CreateIncomingOrderRepository(orderProcessingQueueName, fakeSqsClient);
 
         await target.GetNextOrderAsync();
-        
+
         A.CallTo(() => fakeSqsClient.DeleteMessageAsync(queueUrl, "handle-1", A<CancellationToken>._))
             .MustHaveHappened();
     }
-    
+
     [Test]
     public async Task GetNextOrder_ValidOrder_ReturnMessage()
     {
         const string orderProcessingQueueName = "test-queue";
         const string queueUrl = "http://test-queue-url";
-        
+
         var fakeSqsClient = A.Fake<IAmazonSQS>();
-        
+
         A.CallTo(() => fakeSqsClient.GetQueueUrlAsync(orderProcessingQueueName, A<CancellationToken>._))
             .Returns(Task.FromResult(new GetQueueUrlResponse
             {
@@ -107,89 +110,92 @@ public class IncomingOrderRepositoryUnitTests
         {
             CustomerName = "customer-1",
             ShippingAddress = "shipping-1",
-            Items = new []{"item-1", "item-2"}
+            Items = new[] { "item-1", "item-2" }
         };
         var message = JsonSerializer.Serialize(createOrderMessage);
         A.CallTo(() => fakeSqsClient.ReceiveMessageAsync(A<ReceiveMessageRequest>._, A<CancellationToken>._))
             .Returns(Task.FromResult(new ReceiveMessageResponse
             {
-                Messages = new List<Message>{ new()
+                Messages = new List<Message>
                 {
-                    MessageId = "message-1",
-                    ReceiptHandle = "handle-1",
-                    Body = message
-                } }
+                    new()
+                    {
+                        MessageId = "message-1",
+                        ReceiptHandle = "handle-1",
+                        Body = message
+                    }
+                }
             }));
-        
+
         var target = CreateIncomingOrderRepository(orderProcessingQueueName, fakeSqsClient);
 
 
         var result = await target.GetNextOrderAsync();
-        
+
         Assert.That(result, Is.EqualTo(createOrderMessage));
     }
-    
+
     [Test]
     public async Task GetNextOrder_NoMessageReturned_ReturnNull()
     {
         const string orderProcessingQueueName = "test-queue";
         const string queueUrl = "http://test-queue-url";
-        
+
         var fakeSqsClient = A.Fake<IAmazonSQS>();
-        
+
         A.CallTo(() => fakeSqsClient.GetQueueUrlAsync(orderProcessingQueueName, A<CancellationToken>._))
             .Returns(Task.FromResult(new GetQueueUrlResponse
             {
                 QueueUrl = queueUrl
             }));
 
-           A.CallTo(() => fakeSqsClient.ReceiveMessageAsync(A<ReceiveMessageRequest>._, A<CancellationToken>._))
+        A.CallTo(() => fakeSqsClient.ReceiveMessageAsync(A<ReceiveMessageRequest>._, A<CancellationToken>._))
             .Returns(Task.FromResult(new ReceiveMessageResponse
             {
                 Messages = new List<Message>()
             }));
-        
-           var target = CreateIncomingOrderRepository(orderProcessingQueueName, fakeSqsClient);
+
+        var target = CreateIncomingOrderRepository(orderProcessingQueueName, fakeSqsClient);
 
 
         var result = await target.GetNextOrderAsync();
-        
+
         Assert.That(result, Is.Null);
     }
-    
+
     [Test]
     public async Task GetNextOrder_ErrorParsingMessage_DoNotCallDelete()
     {
         const string orderProcessingQueueName = "test-queue";
         const string queueUrl = "http://test-queue-url";
-        
+
         var fakeSqsClient = A.Fake<IAmazonSQS>();
-        
+
         A.CallTo(() => fakeSqsClient.GetQueueUrlAsync(orderProcessingQueueName, A<CancellationToken>._))
             .Returns(Task.FromResult(new GetQueueUrlResponse
             {
                 QueueUrl = queueUrl
             }));
 
-       
+
         A.CallTo(() => fakeSqsClient.ReceiveMessageAsync(A<ReceiveMessageRequest>._, A<CancellationToken>._))
             .Returns(Task.FromResult(new ReceiveMessageResponse
             {
                 Messages = new List<Message>
                 {
-                    new Message
+                    new()
                     {
                         ReceiptHandle = "handle-1",
                         Body = "dummy string"
                     }
                 }
             }));
-        
+
         var target = CreateIncomingOrderRepository(orderProcessingQueueName, fakeSqsClient);
 
-         await target.GetNextOrderAsync();
-        
-        A.CallTo(() => 
+        await target.GetNextOrderAsync();
+
+        A.CallTo(() =>
                 fakeSqsClient.DeleteMessageAsync(queueUrl, "handle-1", A<CancellationToken>._))
             .MustNotHaveHappened();
     }

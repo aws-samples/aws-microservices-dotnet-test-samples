@@ -1,3 +1,4 @@
+using Common.TestUtils.TestBaseClasses;
 using OrderService.Contracts;
 using ShoppingCartService.BusinessLogic.Models;
 using ShoppingCartService.Config;
@@ -24,7 +25,7 @@ public class OrderServiceNotificationIntegrationTests : SqsTestBase
             City = "NY",
             Street = "12345 St."
         };
-        
+
         await target.SendOrder(items, shippingAddress);
 
         var actualMessage = await GetNextMessage<CreateOrderMessage>();
@@ -35,7 +36,7 @@ public class OrderServiceNotificationIntegrationTests : SqsTestBase
             ShippingAddress = "12345 St. NY, US",
             Items = new[] { "item-1", "item-2", "item-3" }
         };
-        
+
         Assert.That(actualMessage, Is.EqualTo(expected));
     }
 
@@ -46,7 +47,7 @@ public class OrderServiceNotificationIntegrationTests : SqsTestBase
         {
             OrderProcessingQueueName = null
         });
-        
+
         var items = new[] { "item-1", "item-2", "item-3" };
         var shippingAddress = new ShippingAddress
         {
@@ -55,10 +56,10 @@ public class OrderServiceNotificationIntegrationTests : SqsTestBase
             City = "NY",
             Street = "12345 St."
         };
-        
-       Assert.ThrowsAsync<ApplicationException>(async() => await target.SendOrder(items, shippingAddress));
+
+        Assert.ThrowsAsync<ApplicationException>(async () => await target.SendOrder(items, shippingAddress));
     }
-    
+
     [Test]
     public void SendOrder_QueueDoesNoExist_ThrowApplicationException()
     {
@@ -66,7 +67,7 @@ public class OrderServiceNotificationIntegrationTests : SqsTestBase
         {
             OrderProcessingQueueName = "unknown-queue"
         });
-        
+
         var items = new[] { "item-1", "item-2", "item-3" };
         var shippingAddress = new ShippingAddress
         {
@@ -75,7 +76,7 @@ public class OrderServiceNotificationIntegrationTests : SqsTestBase
             City = "NY",
             Street = "12345 St."
         };
-        
-       Assert.ThrowsAsync<ApplicationException>(async() => await target.SendOrder(items, shippingAddress));
+
+        Assert.ThrowsAsync<ApplicationException>(async () => await target.SendOrder(items, shippingAddress));
     }
 }

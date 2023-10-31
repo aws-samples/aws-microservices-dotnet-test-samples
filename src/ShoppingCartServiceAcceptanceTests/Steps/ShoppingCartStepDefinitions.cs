@@ -14,8 +14,12 @@ namespace ShoppingCartServiceAcceptanceTests.Steps;
 [Binding]
 public class ShoppingCartStepDefinitions
 {
-    private readonly TestServerDriver _testServerDriver;
     private readonly InventoryServiceDriver _inventoryServiceDriver;
+    private readonly TestServerDriver _testServerDriver;
+    private HttpResponseMessage? _lastAddResponse;
+
+    private string? _lastCreatedShoppingCartId;
+    private ShoppingCartDto? _lastQueriedShoppingCart;
 
     public ShoppingCartStepDefinitions(TestServerDriver testServerDriver, InventoryServiceDriver inventoryServiceDriver)
     {
@@ -25,10 +29,6 @@ public class ShoppingCartStepDefinitions
 
     private ShippingAddressDto DefaultShippingAddress =>
         new("Customer name", "USA", "NY", "12345 St.");
-
-    private string? _lastCreatedShoppingCartId;
-    private ShoppingCartDto? _lastQueriedShoppingCart;
-    private HttpResponseMessage? _lastAddResponse;
 
     [Given(@"a user creates a new shopping cart")]
     public async Task GivenAUserCreatesANewShoppingCart()

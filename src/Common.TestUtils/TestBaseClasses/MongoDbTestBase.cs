@@ -1,15 +1,15 @@
 using Common.TestUtils.DataAccess;
-using InventoryService.Config;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Servers;
+using NUnit.Framework;
 
-namespace InventoryServiceTests;
+namespace Common.TestUtils.TestBaseClasses;
 
 public class MongoDbTestBase
 {
-    private const string TestDatabaseName = "TestDb";
     private const int MongoOutPort = 2222;
     private static MongoDbRunner? _mongoDbRunner;
+    protected string TestDatabaseName => "TestDb";
+    protected string ConnectionString => _mongoDbRunner!.ConnectionString;
 
     [OneTimeSetUp]
     public static void InitMongo()
@@ -23,20 +23,11 @@ public class MongoDbTestBase
         _mongoDbRunner?.Dispose();
         _mongoDbRunner = null;
     }
-     
+
     [TearDown]
     public void CleanDb()
     {
         var client = new MongoClient(_mongoDbRunner!.ConnectionString);
         client.DropDatabase(TestDatabaseName);
-    }
-
-    protected IInventoryDatabaseSettings GetDatabaseSettings()
-    {
-        return new InventoryDatabaseSettings()
-        {
-            DatabaseName = TestDatabaseName,
-            ConnectionString = _mongoDbRunner!.ConnectionString,
-        };
     }
 }

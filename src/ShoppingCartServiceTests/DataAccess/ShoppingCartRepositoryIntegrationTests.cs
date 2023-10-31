@@ -1,4 +1,5 @@
 using Amazon.DynamoDBv2.DataModel;
+using Common.TestUtils.TestBaseClasses;
 using ShoppingCartService.BusinessLogic.Models;
 using ShoppingCartService.DataAccess;
 using ShoppingCartService.DataAccess.Entities;
@@ -100,10 +101,10 @@ public class ShoppingCartRepositoryIntegrationTests : DynamoDbTestBase
 
         var context = new DynamoDBContext(Client);
         var actual = await context.LoadAsync<ShoppingCartDo>(shoppingCartDo.Id);
-        
-        Assert.That(actual.Items, Is.EqualTo(new[]{"product-1"}));
-    }   
-    
+
+        Assert.That(actual.Items, Is.EqualTo(new[] { "product-1" }));
+    }
+
     [Test]
     public async Task AddItemToCustomer_ShoppingCartReturned()
     {
@@ -121,9 +122,9 @@ public class ShoppingCartRepositoryIntegrationTests : DynamoDbTestBase
         var actual = await target.AddItemToCart(shoppingCartDo.Id, "product-1");
 
         Assert.That(actual, Is.Not.Null);
-        Assert.That(actual!.Items, Is.EqualTo(new[]{"product-1"}));
+        Assert.That(actual!.Items, Is.EqualTo(new[] { "product-1" }));
     }
-    
+
     [Test]
     public async Task AddItemToCustomer_CartNotFound_returnNull()
     {
@@ -131,6 +132,5 @@ public class ShoppingCartRepositoryIntegrationTests : DynamoDbTestBase
         var result = await target.AddItemToCart("cart-1", "product-1");
 
         Assert.That(result, Is.Null);
-    }   
-
+    }
 }

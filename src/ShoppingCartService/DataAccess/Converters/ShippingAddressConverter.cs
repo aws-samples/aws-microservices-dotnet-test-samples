@@ -8,14 +8,14 @@ namespace ShoppingCartService.DataAccess.Converters;
 public class ShippingAddressConverter : IPropertyConverter
 {
     private readonly XmlSerializer _serializer = new(typeof(ShippingAddress));
-    
+
     public object? FromEntry(DynamoDBEntry entry)
     {
         if (entry is not Primitive primitive) return null;
 
         if (primitive.Type != DynamoDBEntryType.String) throw new InvalidCastException();
         var xml = primitive.AsString();
-        
+
         using var reader = new StringReader(xml);
         return _serializer.Deserialize(reader);
     }
@@ -30,6 +30,7 @@ public class ShippingAddressConverter : IPropertyConverter
             _serializer.Serialize(stringWriter, address);
             xml = stringWriter.ToString();
         }
+
         return new Primitive(xml);
     }
 }

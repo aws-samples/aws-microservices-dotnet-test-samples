@@ -6,12 +6,9 @@ public enum OrderStatus
     MissingItems,
     ReadyForShipping
 }
+
 public class Order
 {
-    private IEnumerable<OrderItem> Items { get; }
-    private string CustomerName { get; }
-    private string ShippingAddress { get; }
-
     public Order(string customerName, string shippingAddress, IEnumerable<OrderItem> items)
     {
         Items = items;
@@ -19,16 +16,34 @@ public class Order
         ShippingAddress = shippingAddress;
     }
 
+    private IEnumerable<OrderItem> Items { get; }
+    private string CustomerName { get; }
+    private string ShippingAddress { get; }
+
+    public OrderStatus Status
+    {
+        get
+        {
+            if (!Items.Any())
+                return OrderStatus.NoItemsInOrder;
+
+            return Items.Any(i => i.ItemStatus == ItemStatus.NotInInventory)
+                ? OrderStatus.MissingItems
+                : OrderStatus.ReadyForShipping;
+        }
+    }
+
     protected bool Equals(Order other)
     {
-        return Items.SequenceEqual(other.Items) && CustomerName == other.CustomerName && ShippingAddress == other.ShippingAddress;
+        return Items.SequenceEqual(other.Items) && CustomerName == other.CustomerName &&
+               ShippingAddress == other.ShippingAddress;
     }
 
     public override bool Equals(object? obj)
     {
         if (ReferenceEquals(null, obj)) return false;
         if (ReferenceEquals(this, obj)) return true;
-        if (obj.GetType() != this.GetType()) return false;
+        if (obj.GetType() != GetType()) return false;
         return Equals((Order)obj);
     }
 
@@ -37,25 +52,11 @@ public class Order
         return HashCode.Combine(Items, CustomerName, ShippingAddress);
     }
 
-    
+
     public override string ToString()
     {
         return $"{nameof(Items)}: {string.Join("| ", Items.Select(i => i.ToString()))}, " +
                $"{nameof(CustomerName)}: {CustomerName}, " +
                $"{nameof(ShippingAddress)}: {ShippingAddress}";
-    }
-
-    public OrderStatus Status
-    {
-        get
-        {
-            if (!Items.Any())
-                return OrderStatus.NoItemsInOrder;
-            
-            return Items.Any(i => i.ItemStatus == ItemStatus.NotInInventory)
-                ? OrderStatus.MissingItems
-                : OrderStatus.ReadyForShipping;
-          
-        }
     }
 }

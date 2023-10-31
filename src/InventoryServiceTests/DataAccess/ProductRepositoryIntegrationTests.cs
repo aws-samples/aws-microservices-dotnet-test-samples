@@ -1,3 +1,4 @@
+using Common.TestUtils.TestBaseClasses;
 using InventoryService.Config;
 using InventoryService.DataAccess;
 using InventoryService.DataAccess.Entities;
@@ -8,12 +9,20 @@ namespace InventoryServiceTests.DataAccess;
 public class ProductRepositoryIntegrationTests : MongoDbTestBase
 {
     private const string InvalidId = "507f191e810c19729de860ea";
-    
-  
+
+    private IInventoryDatabaseSettings GetDatabaseSettings()
+    {
+        return new InventoryDatabaseSettings
+        {
+            DatabaseName = TestDatabaseName,
+            ConnectionString = ConnectionString
+        };
+    }
+
     [Test]
     public void FindAll_NoProductInDB_ReturnEmptyList()
     {
-        var target = new ProductRepository (GetDatabaseSettings());
+        var target = new ProductRepository(GetDatabaseSettings());
 
         var actual = target.FindAll();
 
@@ -36,7 +45,7 @@ public class ProductRepositoryIntegrationTests : MongoDbTestBase
         var expected = new List<Product> { product1, product2 };
         Assert.That(actual, Is.EqualTo(expected));
     }
-    
+
     [Test]
     public void GetById_hasThreeCartsInDB_returnReturnOnlyCartWithCorrectId()
     {
@@ -71,7 +80,7 @@ public class ProductRepositoryIntegrationTests : MongoDbTestBase
         target.Create(product3);
 
         var actual = target.FindById(InvalidId);
-        
+
         Assert.That(actual, Is.Null);
     }
 

@@ -4,7 +4,6 @@ namespace ShoppingCartService.Controllers.Models;
 
 public record CreateShoppingCartDto([Required] ShippingAddressDto ShippingAddress);
 
-
 public record ShoppingCartDto
 {
     public string Id { get; init; } = null!;

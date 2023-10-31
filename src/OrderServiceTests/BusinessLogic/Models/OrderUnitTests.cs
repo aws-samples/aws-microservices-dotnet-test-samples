@@ -9,7 +9,7 @@ public class OrderUnitTests
     public void OrderHasNoItems_StatusIsNoItemsInOrder()
     {
         var target = new Order("", "", Array.Empty<OrderItem>());
-        
+
         Assert.That(target.Status, Is.EqualTo(OrderStatus.NoItemsInOrder));
     }
 
@@ -21,7 +21,7 @@ public class OrderUnitTests
         {
             new OrderItem("", itemStatus)
         });
-        
+
         Assert.That(target.Status, Is.EqualTo(expected));
     }
 
@@ -33,7 +33,7 @@ public class OrderUnitTests
             new OrderItem("", ItemStatus.Ready),
             new OrderItem("", ItemStatus.NotInInventory)
         });
-        
+
         Assert.That(target.Status, Is.EqualTo(OrderStatus.MissingItems));
     }
 }

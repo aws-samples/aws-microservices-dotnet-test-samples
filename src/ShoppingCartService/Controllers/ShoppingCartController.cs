@@ -18,7 +18,6 @@ public class ShoppingCartController : ControllerBase
         _logger = logger;
     }
 
-   
 
     /// <summary>
     ///     Get cart by id
@@ -29,7 +28,7 @@ public class ShoppingCartController : ControllerBase
     {
         try
         {
-            return  await _shoppingCartManager.FindById(id);
+            return await _shoppingCartManager.FindById(id);
         }
         catch (ShoppingCartNotFoundException exception)
         {
@@ -37,7 +36,7 @@ public class ShoppingCartController : ControllerBase
             return NotFound();
         }
     }
-    
+
     /// <summary>
     ///     Create a new shopping cart
     /// </summary>
@@ -46,9 +45,9 @@ public class ShoppingCartController : ControllerBase
     {
         var result = await _shoppingCartManager.CreateAsync(createCart);
 
-        return CreatedAtRoute("GetCart", new {id = result.Id}, result);
+        return CreatedAtRoute("GetCart", new { id = result.Id }, result);
     }
-    
+
     /// <summary>
     ///     Add product to existing cart
     /// </summary>
@@ -60,7 +59,7 @@ public class ShoppingCartController : ControllerBase
         try
         {
             var shoppingCartDto = await _shoppingCartManager.AddItemToCart(id, productId);
-            return  Ok(shoppingCartDto);
+            return Ok(shoppingCartDto);
         }
         catch (ShoppingCartNotFoundException exception)
         {
@@ -77,7 +76,7 @@ public class ShoppingCartController : ControllerBase
     }
 
     /// <summary>
-    /// Finlize shopping cart and send to order processing
+    ///     Finlize shopping cart and send to order processing
     /// </summary>
     /// <param name="id">Shopping cart id</param>
     [HttpPost("/checkout/{id}")]

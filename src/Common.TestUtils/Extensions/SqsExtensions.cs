@@ -27,12 +27,14 @@ public static class SqsExtensions
         Assert.NotNull(message.Body);
         return message;
     }
-    
+
     private static async Task<ReceiveMessageResponse> GetNextMessageInternal(IAmazonSQS sqsClient, string queueUrl)
     {
         return await GetNextMessageInternal(sqsClient, queueUrl, _ => true);
     }
-    private static async Task<ReceiveMessageResponse> GetNextMessageInternal(IAmazonSQS sqsClient, string queueUrl, Predicate<Message> checkForMessage)
+
+    private static async Task<ReceiveMessageResponse> GetNextMessageInternal(IAmazonSQS sqsClient, string queueUrl,
+        Predicate<Message> checkForMessage)
     {
         var receiveMessageRequest = new ReceiveMessageRequest
         {
@@ -53,11 +55,9 @@ public static class SqsExtensions
         do
         {
             receiveMessageResponse = await sqsClient.ReceiveMessageAsync(receiveMessageRequest);
-            if (receiveMessageResponse.Messages.Count != 0 && 
+            if (receiveMessageResponse.Messages.Count != 0 &&
                 checkForMessage.Invoke(receiveMessageResponse.Messages[0]))
-            {
                 break;
-            }
         } while (count++ < 30); // 20 secs * 30 = 10 min max
 
         return receiveMessageResponse;

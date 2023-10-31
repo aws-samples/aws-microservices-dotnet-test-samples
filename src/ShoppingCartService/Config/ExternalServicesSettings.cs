@@ -1,9 +1,8 @@
-﻿namespace ShoppingCartService.Config
+﻿namespace ShoppingCartService.Config;
+
+public class ExternalServicesSettings : IExternalServicesSettings
 {
-    public class ExternalServicesSettings : IExternalServicesSettings
-    {
-        public string? InventoryServiceBaseUrl { get; set; }
-        
-        public string? OrderProcessingQueueName { get; set; }
-    }
+    public string? InventoryServiceBaseUrl { get; set; }
+
+    public string? OrderProcessingQueueName { get; set; }
 }
