@@ -19,6 +19,11 @@ public class OrderProcessingManager
     {
         var createOrderMessage = await _incomingOrderRepository.GetNextOrderAsync();
 
+        if (createOrderMessage is null)
+        {
+            return;
+        }
+        
         var orderItems = new List<OrderItem>();
 
         foreach (var productId in createOrderMessage.Items)

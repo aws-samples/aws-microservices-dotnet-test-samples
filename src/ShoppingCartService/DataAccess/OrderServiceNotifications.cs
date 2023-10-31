@@ -2,6 +2,7 @@ using System.Text.Json;
 using Amazon.SQS;
 using Amazon.SQS.Model;
 using AutoMapper;
+using Common.Sqs;
 using OrderService.Contracts;
 using ShoppingCartService.BusinessLogic.Models;
 using ShoppingCartService.Config;
@@ -27,18 +28,12 @@ public class OrderServiceNotifications : IOrderServiceNotifications
             ShippingAddress = $"{shippingAddress.Street} {shippingAddress.City}, {shippingAddress.Country}"
         };
 
-        if (_queueName is null or "")
-        {
-            throw new ApplicationException("Cannot send order, missing queue name");
-        }
-
-
-        try
-        {
-            var getQueueUrlResponse = await _sqsClient.GetQueueUrlAsync(_queueName);
+       try
+       {
+           var queueUrl = await _sqsClient.GetQueueUrlExAsync(_queueName);
 
             var jsonString = JsonSerializer.Serialize(message);
-            var sendMessageRequest = new SendMessageRequest(getQueueUrlResponse.QueueUrl, jsonString);
+            var sendMessageRequest = new SendMessageRequest(queueUrl, jsonString);
             
             await _sqsClient.SendMessageAsync(sendMessageRequest);
         }

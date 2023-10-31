@@ -1,3 +1,4 @@
+using Amazon.SecurityToken.Model;
 using Autofac.Extras.FakeItEasy;
 using Common.TestUtils;
 using FakeItEasy;
@@ -26,7 +27,7 @@ public class OrderProcessingManagerUnitTests
         };
         
         A.CallTo(() => fakeIncomingOrderRepository.GetNextOrderAsync())
-            .Returns(Task.FromResult(createOrderMessage));
+            .Returns(Task.FromResult<CreateOrderMessage?>(createOrderMessage));
 
         var fakeInventoryRepository = autoFake.Resolve<IInventoryRepository>();
         A.CallTo(() => fakeInventoryRepository.GetItemFromInventory("item-1"))
@@ -60,7 +61,7 @@ public class OrderProcessingManagerUnitTests
         };
         
         A.CallTo(() => fakeIncomingOrderRepository.GetNextOrderAsync())
-            .Returns(Task.FromResult(createOrderMessage));
+            .Returns(Task.FromResult<CreateOrderMessage?>(createOrderMessage));
 
         var fakeInventoryRepository = autoFake.Resolve<IInventoryRepository>();
         A.CallTo(() => fakeInventoryRepository.GetItemFromInventory("item-1"))
@@ -94,7 +95,7 @@ public class OrderProcessingManagerUnitTests
         };
         
         A.CallTo(() => fakeIncomingOrderRepository.GetNextOrderAsync())
-            .Returns(Task.FromResult(createOrderMessage));
+            .Returns(Task.FromResult<CreateOrderMessage?>(createOrderMessage));
 
         var fakeInventoryRepository = autoFake.Resolve<IInventoryRepository>();
         A.CallTo(() => fakeInventoryRepository.GetItemFromInventory("item-1"))
@@ -103,7 +104,7 @@ public class OrderProcessingManagerUnitTests
         A.CallTo(() => fakeInventoryRepository.GetItemFromInventory("item-2"))
             .Returns(Task.FromResult(new GetFromInventoryResult(false, string.Empty)));
 
-        var fakeOrderRepository = autoFake.Resolve<IOrderRepository>();
+      
         var target = autoFake.Resolve<OrderProcessingManager>();
 
         await target.ProcessNextMessage();
@@ -117,7 +118,42 @@ public class OrderProcessingManagerUnitTests
                 new OrderItem("item-2", ItemStatus.NotInInventory)
             });
         
+        var fakeOrderRepository = autoFake.Resolve<IOrderRepository>();
         A.CallTo(() => fakeOrderRepository.SaveOrderAsync(expected))
             .MustHaveHappened();
+    }
+
+    [Test]
+    public async Task ProcessNextMessage_RepositoryReturnNull_DoNotCallOtherRepositories()
+    {
+        using var autoFake = new AutoFake();
+
+        var fakeIncomingOrderRepository = autoFake.Resolve<IIncomingOrderRepository>();
+        var createOrderMessage = new CreateOrderMessage
+        {
+            CustomerName = "customer-1",
+            ShippingAddress = "address-1",
+            Items = new[]{"item-1", "item-2"}
+        };
+        
+        A.CallTo(() => fakeIncomingOrderRepository.GetNextOrderAsync())
+            .Returns(Task.FromResult<CreateOrderMessage?>(null));
+        
+        var target = autoFake.Resolve<OrderProcessingManager>();
+
+        await target.ProcessNextMessage();
+        
+        var fakeInventoryRepository = autoFake.Resolve<IInventoryRepository>();
+        var fakeOrderRepository = autoFake.Resolve<IOrderRepository>();
+        
+        Assert.Multiple(() =>
+            {
+                A.CallTo(() => fakeInventoryRepository.GetItemFromInventory(A<string>._))
+                    .MustNotHaveHappened();
+                
+                A.CallTo(() => fakeOrderRepository.SaveOrderAsync(A<Order>._))
+                    .MustNotHaveHappened();
+            }
+            );
     }
 }
