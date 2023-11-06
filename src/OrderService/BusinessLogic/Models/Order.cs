@@ -9,16 +9,18 @@ public enum OrderStatus
 
 public class Order
 {
-    public Order(string customerName, string shippingAddress, IEnumerable<OrderItem> items)
+    public Order(string id, string customerName, string shippingAddress, IEnumerable<OrderItem> items)
     {
+        Id = id;
         Items = items;
         CustomerName = customerName;
         ShippingAddress = shippingAddress;
     }
 
-    private IEnumerable<OrderItem> Items { get; }
-    private string CustomerName { get; }
-    private string ShippingAddress { get; }
+    public string Id { get; }
+    public IEnumerable<OrderItem> Items { get; }
+    public string CustomerName { get; }
+    public string ShippingAddress { get; }
 
     public OrderStatus Status
     {

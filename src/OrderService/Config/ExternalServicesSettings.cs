@@ -2,7 +2,7 @@
 
 public class ExternalServicesSettings : IExternalServicesSettings
 {
-    public string? InventoryServiceBaseUrl { get; set; }
-
-    public string? OrderProcessingQueueName { get; set; }
+    public string? InventoryServiceBaseUrl { get; init; }
+    public string? OrderProcessingQueueName { get; init; }
+    public string? OrderBucketName { get; init; }
 }

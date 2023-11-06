@@ -69,7 +69,7 @@ public class IncomingOrderRepositoryUnitTests
                 QueueUrl = queueUrl
             }));
 
-        var message = JsonSerializer.Serialize(new CreateOrderMessage());
+        var message = JsonSerializer.Serialize(new CreateOrderMessage("message-1"));
         A.CallTo(() => fakeSqsClient.ReceiveMessageAsync(A<ReceiveMessageRequest>._, A<CancellationToken>._))
             .Returns(Task.FromResult(new ReceiveMessageResponse
             {
@@ -106,7 +106,7 @@ public class IncomingOrderRepositoryUnitTests
                 QueueUrl = queueUrl
             }));
 
-        var createOrderMessage = new CreateOrderMessage
+        var createOrderMessage = new CreateOrderMessage("message-1")
         {
             CustomerName = "customer-1",
             ShippingAddress = "shipping-1",

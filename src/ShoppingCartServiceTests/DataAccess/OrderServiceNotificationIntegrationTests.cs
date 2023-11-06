@@ -30,7 +30,7 @@ public class OrderServiceNotificationIntegrationTests : SqsTestBase
 
         var actualMessage = await GetNextMessage<CreateOrderMessage>();
 
-        var expected = new CreateOrderMessage
+        var expected = new CreateOrderMessage(actualMessage.Id)
         {
             CustomerName = "John Smith",
             ShippingAddress = "12345 St. NY, US",

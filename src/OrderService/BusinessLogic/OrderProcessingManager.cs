@@ -33,11 +33,11 @@ public class OrderProcessingManager
             orderItems.Add(new OrderItem(productId, itemStatus));
         }
 
-        var order = new Order(
-            createOrderMessage.CustomerName,
+        var order = new Order(createOrderMessage.Id, createOrderMessage.CustomerName,
             createOrderMessage.ShippingAddress,
             orderItems);
 
+        // TODO: avoid saving empty orders
         await _orderRepository.SaveOrderAsync(order);
     }
 }

@@ -2,11 +2,17 @@
 
 public class CreateOrderMessage
 {
+    public string Id { get; } 
     public IEnumerable<string> Items { get; set; } = Enumerable.Empty<string>();
 
     public string CustomerName { get; set; } = null!;
 
     public string ShippingAddress { get; set; } = null!;
+
+    public CreateOrderMessage(string id)
+    {
+        Id = id;
+    }
 
     protected bool Equals(CreateOrderMessage other)
     {

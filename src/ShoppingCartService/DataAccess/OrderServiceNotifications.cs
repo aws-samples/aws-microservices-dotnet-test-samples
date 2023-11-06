@@ -21,7 +21,7 @@ public class OrderServiceNotifications : IOrderServiceNotifications
 
     public async Task SendOrder(IEnumerable<string> itemIds, ShippingAddress shippingAddress)
     {
-        var message = new CreateOrderMessage
+        var message = new CreateOrderMessage(Guid.NewGuid().ToString())
         {
             Items = itemIds,
             CustomerName = shippingAddress.Name,

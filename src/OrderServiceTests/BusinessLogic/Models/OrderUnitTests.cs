@@ -8,7 +8,7 @@ public class OrderUnitTests
     [Test]
     public void OrderHasNoItems_StatusIsNoItemsInOrder()
     {
-        var target = new Order("", "", Array.Empty<OrderItem>());
+        var target = new Order("", "", "", Array.Empty<OrderItem>());
 
         Assert.That(target.Status, Is.EqualTo(OrderStatus.NoItemsInOrder));
     }
@@ -17,7 +17,7 @@ public class OrderUnitTests
     [TestCase(ItemStatus.Ready, OrderStatus.ReadyForShipping)]
     public void OrderHasOneItem_StatusBasedOnItem(ItemStatus itemStatus, OrderStatus expected)
     {
-        var target = new Order("", "", new[]
+        var target = new Order("", "", "", new[]
         {
             new OrderItem("", itemStatus)
         });
@@ -28,7 +28,7 @@ public class OrderUnitTests
     [Test]
     public void OrderHasMultipleItemsOneIsNotReady_OrderStatusIsMissingItems()
     {
-        var target = new Order("", "", new[]
+        var target = new Order("", "", "", new[]
         {
             new OrderItem("", ItemStatus.Ready),
             new OrderItem("", ItemStatus.NotInInventory)

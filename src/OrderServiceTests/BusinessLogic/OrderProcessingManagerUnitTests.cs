@@ -17,7 +17,7 @@ public class OrderProcessingManagerUnitTests
         using var autoFake = new AutoFake();
 
         var fakeIncomingOrderRepository = autoFake.Resolve<IIncomingOrderRepository>();
-        var createOrderMessage = new CreateOrderMessage
+        var createOrderMessage = new CreateOrderMessage("message-1")
         {
             CustomerName = "customer-1",
             ShippingAddress = "address-1",
@@ -36,8 +36,7 @@ public class OrderProcessingManagerUnitTests
 
         await target.ProcessNextMessage();
 
-        var expected = new Order(
-            "customer-1",
+        var expected = new Order("message-1", "customer-1",
             "address-1",
             new[] { new OrderItem("item-1", ItemStatus.Ready) });
 
@@ -51,7 +50,7 @@ public class OrderProcessingManagerUnitTests
         using var autoFake = new AutoFake();
 
         var fakeIncomingOrderRepository = autoFake.Resolve<IIncomingOrderRepository>();
-        var createOrderMessage = new CreateOrderMessage
+        var createOrderMessage = new CreateOrderMessage("message-1")
         {
             CustomerName = "customer-1",
             ShippingAddress = "address-1",
@@ -70,8 +69,7 @@ public class OrderProcessingManagerUnitTests
 
         await target.ProcessNextMessage();
 
-        var expected = new Order(
-            "customer-1",
+        var expected = new Order("message-1", "customer-1",
             "address-1",
             new[] { new OrderItem("item-1", ItemStatus.NotInInventory) });
 
@@ -86,7 +84,7 @@ public class OrderProcessingManagerUnitTests
         using var autoFake = new AutoFake();
 
         var fakeIncomingOrderRepository = autoFake.Resolve<IIncomingOrderRepository>();
-        var createOrderMessage = new CreateOrderMessage
+        var createOrderMessage = new CreateOrderMessage("message-1")
         {
             CustomerName = "customer-1",
             ShippingAddress = "address-1",
@@ -108,8 +106,7 @@ public class OrderProcessingManagerUnitTests
 
         await target.ProcessNextMessage();
 
-        var expected = new Order(
-            "customer-1",
+        var expected = new Order("message-1", "customer-1",
             "address-1",
             new[]
             {

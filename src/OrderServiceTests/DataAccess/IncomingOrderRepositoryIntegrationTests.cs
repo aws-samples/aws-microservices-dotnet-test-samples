@@ -18,7 +18,7 @@ public class IncomingOrderRepositoryIntegrationTests : SqsTestBase
         
         var target = new IncomingOrderRepository(SqsClient, settings, logger);
 
-        var message = new CreateOrderMessage
+        var message = new CreateOrderMessage("message-1")
         {
             CustomerName = "customer-1",
             ShippingAddress = "address-1",
