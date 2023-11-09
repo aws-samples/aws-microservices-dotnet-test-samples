@@ -1,9 +1,10 @@
 ## .NET Microservices Test Samples
 This repository contains a sample of how to test an ASP.NET Core micro-service architecture that have external dependencies including AWS services.
 
-The application is built out of two microservices:
+The application is built out of three microservices:
 - [Inventory service](./src/InventoryService/) used to manage products and stores product data in NoSql data store (MongoDB)
 - [Shopping cart service](./src/ShoppingCartService/) used by shoppers to add items to their shopping cart and checkout these items. the shopping cart service uses [Amazon DynamoDB](https://aws.amazon.com/dynamodb/) to store data and [Amazon Simple Queue Service (SQS)](https://aws.amazon.com/sqs/) to send orders for additional processing.
+- [Order service](./src/OrderService/) background worker that processes incoming orders, checks product availability and stores the results. The order service polls [Amazon Simple Queue Service (SQS)](https://aws.amazon.com/sqs/) for new messages and stores results in [Amazon Simple Storage Service (S3)](https://aws.amazon.com/s3).
 
 ## Architecture
 ![Micro service architecture using .NET web API and AWS services](./media/dotnet-microservice-test-sample.png)
@@ -20,9 +21,15 @@ The solution is split into multiple projects, each service has it's source code,
 - [ShoppingCartService](./src/ShoppingCartService/) - Shopping cart service source code
 - [ShoppingCartServiceTests](/src/ShoppingCartServiceTests/) - Unit and integration tests
 - [ShoppingCartServiceAcceptanceTests](./src/ShoppingCartServiceAcceptanceTests/) - service tests
-### Other
+### Order
+- [OrderService](./src/OrderService/) - Order processing service source code
 - [OrderService.Contracts](./src/OrderService.Contracts/) - message definitions for order processing service(s)
+- [OrderServiceTests](/src/OrderServiceTests/) - Unit and integration tests
+- [OrderServiceAcceptanceTests](/src/OrderServiceAcceptanceTests/) - Service tests
+### Other
+- [Common.Sqs](./src/Common.Sqs/) - Sqs helper functions used by services
 - [Common.TestUtils](./src/Common.TestUtils/) - utilities for test initialization and assertions
+- [Common.InventoryServiceFakeServer](./src/Common.InventoryServiceFakeServer/) - fake inventory service used in service tests
 
 ## Automated Tests
 The source code for this sample includes automated unit, integration and service tests. [NUnit](https://nunit.org/) is the test framework used to write these tests. A few other libraries and frameworks are used depending on the test type. Please see below.
@@ -120,7 +127,7 @@ public class ProductRepositoryIntegrationTests : MongoDbTestBase
 ### Service Tests
 Service tests purpose is to test the service level requirements of your system. (SpecFlow)[https://specflow.org/] a BDD framework for .NET is used to avoid unreadable tests and help make the test readable even for non-technical members of the team.
 "Tests" are built using feature files:
-####[Products.feature](./src/InventoryServiceAcceptanceTests/Features/Products.feature)
+#### [Products.feature](./src/InventoryServiceAcceptanceTests/Features/Products.feature)
 ```Gherkin
 Scenario: Update product quantity
     Given a product "product 1" with price 100 and quantity 10 is in the inventory
@@ -128,8 +135,8 @@ Scenario: Update product quantity
     Then that product is found in repository with name "product 1" price 100 and quantity 20
 ```
 The code in ***StepDefinition** files implement the different steps:
-```C#
 #### [ProductStepDefinitions.cs](./src/InventoryServiceAcceptanceTests/Steps/ProductStepDefinitions.cs)
+```C#
 [When(@"user update product quantity to (.*)")]
 public async Task WhenUserUpdateProductQuantityTo(int quantity)
 {
@@ -139,7 +146,7 @@ public async Task WhenUserUpdateProductQuantityTo(int quantity)
 
 #### Using fake http server
 In addition [WireMock.NET](https://github.com/WireMock-Net/WireMock.Net) is used to fake http calls to other services, for example shopping cart service needs to call inventory service. Inside the test we initialize and then set the behavior or a fake server to return the response needed by the specific test
-####[InventoryServiceDriver.cs](./src/ShoppingCartServiceAcceptanceTests/Drivers/InventoryServiceDriver.cs)
+#### [InventoryServiceDriver.cs](./src/ShoppingCartServiceAcceptanceTests/Drivers/InventoryServiceDriver.cs)
 ```C#
 public class InventoryServiceDriver: IDisposable
 {
@@ -157,6 +164,32 @@ public class InventoryServiceDriver: IDisposable
                     .WithStatusCode(404));
     }
 ```
+
+#### Running ASP.NET Core WebApi in service tests
+Running a single service in a controlled and predictable way is done using *WebApplicationFactory* (*Microsoft.AspNetCore.Mvc.Testing*).
+The common functionality resides in [TestServerDriverBase](./src/Common.TestUtils/Drivers/TestServerDriverBase.cs).
+By using *WebApplicationFactory* we can set a service including all of its services and definitions and create a client to be used during tests.
+``` C#
+public class TestServerDriverBase<TProgram> : IDisposable where TProgram : class
+{
+    private readonly WebApplicationFactory<TProgram> _application;
+    private readonly JsonSerializerOptions _options;
+
+    protected TestServerDriverBase(params (string key, string value)[] settings)
+    {
+        _application = new WebApplicationFactory<TProgram>()
+            .WithWebHostBuilder(builder =>
+            {
+                foreach (var (key, value) in settings) builder.UseSetting(key, value);
+            });
+
+
+        Client = _application.CreateClient();
+    }
+    . . .
+}
+```
+For usage see [Inventory TestServerDriver](./src/InventoryServiceAcceptanceTests/Drivers/TestServerDriver.cs) and [ShoppingCart TestServerDriver](./src/ShoppingCartServiceAcceptanceTests/Drivers/TestServerDriver.cs).
 
 ## Running The Tests
 Running the tests can be done using your IDE or from the command line using ```dotnet test -m:1```. 
