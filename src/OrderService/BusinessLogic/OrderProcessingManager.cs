@@ -27,8 +27,8 @@ public class OrderProcessingManager
 
         foreach (var productId in createOrderMessage.Items)
         {
-            var response = await _inventoryRepository.GetItemFromInventory(productId);
-            var itemStatus = response.HasEnoughQuantity ? ItemStatus.Ready : ItemStatus.NotInInventory;
+            var hasEnoughQuantity = await _inventoryRepository.CheckItemQuantity(productId, 1);
+            var itemStatus = hasEnoughQuantity ? ItemStatus.Ready : ItemStatus.NotInInventory;
 
             orderItems.Add(new OrderItem(productId, itemStatus));
         }
@@ -37,7 +37,6 @@ public class OrderProcessingManager
             createOrderMessage.ShippingAddress,
             orderItems);
 
-        // TODO: avoid saving empty orders
         await _orderRepository.SaveOrderAsync(order);
     }
 }

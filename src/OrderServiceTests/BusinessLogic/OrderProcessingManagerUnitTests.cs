@@ -1,10 +1,10 @@
 using Autofac.Extras.FakeItEasy;
 using FakeItEasy;
+using InventoryService.Contracts.Models;
 using OrderService.BusinessLogic;
 using OrderService.BusinessLogic.Models;
 using OrderService.Contracts;
 using OrderService.DataAccess;
-using OrderService.DataAccess.Entities;
 
 namespace OrderServiceTests.BusinessLogic;
 
@@ -28,8 +28,8 @@ public class OrderProcessingManagerUnitTests
             .Returns(Task.FromResult<CreateOrderMessage?>(createOrderMessage));
 
         var fakeInventoryRepository = autoFake.Resolve<IInventoryRepository>();
-        A.CallTo(() => fakeInventoryRepository.GetItemFromInventory("item-1"))
-            .Returns(Task.FromResult(new GetFromInventoryResult(true, string.Empty)));
+        A.CallTo(() => fakeInventoryRepository.CheckItemQuantity("item-1", 1))
+            .Returns(Task.FromResult(true));
 
         var fakeOrderRepository = autoFake.Resolve<IOrderRepository>();
         var target = autoFake.Resolve<OrderProcessingManager>();
@@ -61,8 +61,8 @@ public class OrderProcessingManagerUnitTests
             .Returns(Task.FromResult<CreateOrderMessage?>(createOrderMessage));
 
         var fakeInventoryRepository = autoFake.Resolve<IInventoryRepository>();
-        A.CallTo(() => fakeInventoryRepository.GetItemFromInventory("item-1"))
-            .Returns(Task.FromResult(new GetFromInventoryResult(false, string.Empty)));
+        A.CallTo(() => fakeInventoryRepository.CheckItemQuantity("item-1", 1))
+            .Returns(Task.FromResult(false));
 
         var fakeOrderRepository = autoFake.Resolve<IOrderRepository>();
         var target = autoFake.Resolve<OrderProcessingManager>();
@@ -95,11 +95,11 @@ public class OrderProcessingManagerUnitTests
             .Returns(Task.FromResult<CreateOrderMessage?>(createOrderMessage));
 
         var fakeInventoryRepository = autoFake.Resolve<IInventoryRepository>();
-        A.CallTo(() => fakeInventoryRepository.GetItemFromInventory("item-1"))
-            .Returns(Task.FromResult(new GetFromInventoryResult(true, string.Empty)));
+        A.CallTo(() => fakeInventoryRepository.CheckItemQuantity("item-1",1 ))
+            .Returns(Task.FromResult(true));
 
-        A.CallTo(() => fakeInventoryRepository.GetItemFromInventory("item-2"))
-            .Returns(Task.FromResult(new GetFromInventoryResult(false, string.Empty)));
+        A.CallTo(() => fakeInventoryRepository.CheckItemQuantity("item-2", 1))
+            .Returns(Task.FromResult(false));
 
 
         var target = autoFake.Resolve<OrderProcessingManager>();
@@ -138,7 +138,7 @@ public class OrderProcessingManagerUnitTests
 
         Assert.Multiple(() =>
             {
-                A.CallTo(() => fakeInventoryRepository.GetItemFromInventory(A<string>._))
+                A.CallTo(() => fakeInventoryRepository.CheckItemQuantity(A<string>._, A<uint>._))
                     .MustNotHaveHappened();
 
                 A.CallTo(() => fakeOrderRepository.SaveOrderAsync(A<Order>._))

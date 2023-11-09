@@ -1,8 +1,6 @@
-using OrderService.DataAccess.Entities;
-
 namespace OrderService.DataAccess;
 
 public interface IInventoryRepository
 {
-    Task<GetFromInventoryResult> GetItemFromInventory(string productId);
+    Task<bool> CheckItemQuantity(string productId, uint quantity);
 }

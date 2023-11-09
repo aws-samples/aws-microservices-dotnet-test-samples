@@ -1,17 +1,16 @@
 using System.Text.Json;
-using Amazon.Runtime.SharedInterfaces;
+using Amazon.S3;
 using OrderService.BusinessLogic.Models;
 using OrderService.Config;
-using OrderService.Extensions;
 
 namespace OrderService.DataAccess;
 
 internal class OrderRepository : IOrderRepository
 {
-    private readonly ICoreAmazonS3 _s3Client;
+    private readonly IAmazonS3 _s3Client;
     private readonly string? _bucketName;
 
-    public OrderRepository(ICoreAmazonS3 s3Client, IExternalServicesSettings externalServicesSettings)
+    public OrderRepository(IAmazonS3 s3Client, IExternalServicesSettings externalServicesSettings)
     {
         _s3Client = s3Client;
         _bucketName = externalServicesSettings.OrderBucketName;

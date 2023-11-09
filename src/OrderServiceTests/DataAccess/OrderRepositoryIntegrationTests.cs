@@ -14,17 +14,7 @@ public class OrderRepositoryIntegrationTests : S3TestBase
     [TearDown]
     public async Task DeleteAllFilesInBucket()
     {
-        var s3Client = new AmazonS3Client();
-
-        var listObjectsResponse = await s3Client.ListObjectsAsync(BucketName);
-
-        await s3Client.DeleteObjectsAsync(new DeleteObjectsRequest
-        {
-            BucketName =   BucketName, 
-            Objects = listObjectsResponse.S3Objects
-                .Select(o => new KeyVersion{Key = o.Key})
-                .ToList()
-        });
+        await DeleteAllFilesAsync();
     }
     
     [Test]

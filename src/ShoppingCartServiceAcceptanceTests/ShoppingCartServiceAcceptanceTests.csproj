@@ -16,11 +16,11 @@
         <PackageReference Include="SpecFlow.NUnit" Version="3.9.74"/>
         <PackageReference Include="nunit" Version="3.13.3"/>
         <PackageReference Include="NUnit3TestAdapter" Version="4.5.0"/>
-        <PackageReference Include="WireMock.Net" Version="1.5.39"/>
 
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Common.InventoryServiceFakeServer\Common.InventoryServiceFakeServer.csproj" />
         <ProjectReference Include="..\Common.TestUtils\Common.TestUtils.csproj"/>
         <ProjectReference Include="..\ShoppingCartService\ShoppingCartService.csproj"/>
     </ItemGroup>

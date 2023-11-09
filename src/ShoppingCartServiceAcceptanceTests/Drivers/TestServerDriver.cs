@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using Common.InventoryServiceFakeServer;
 using Common.TestUtils.DataAccess;
 using Common.TestUtils.Drivers;
 using NUnit.Framework;

@@ -4,7 +4,7 @@ using WireMock.RequestBuilders;
 using WireMock.ResponseBuilders;
 using WireMock.Server;
 
-namespace ShoppingCartServiceAcceptanceTests.Drivers;
+namespace Common.InventoryServiceFakeServer;
 
 public class InventoryServiceDriver : IDisposable
 {

@@ -8,20 +8,27 @@ public class S3TestBase
 {
     private const string BucketNamePrefix = "test-order-bucket";
     protected string BucketName { get; private set; } = null!;
+
+    private S3TestRunner? _s3TestRunner;
     
     [OneTimeSetUp]
-    public void CreateQueue()
+    public void CreateBucket()
     {
         BucketName = $"{BucketNamePrefix}-{Guid.NewGuid()}";
-        var s3Client = new AmazonS3Client();
-        s3Client.PutBucketAsync(BucketName).Wait();
-        
+
+        _s3TestRunner = new S3TestRunner(BucketName);
     }
 
     [OneTimeTearDown]
-    public void DeleteQueue()
+    public void DeleteBucket()
     {
-        var s3Client = new AmazonS3Client();
-        s3Client.DeleteBucketAsync(BucketName).Wait();
+        _s3TestRunner?.Dispose();
+        _s3TestRunner = null;
+    }
+
+    protected async Task DeleteAllFilesAsync()
+    {
+        if (_s3TestRunner != null) 
+            await _s3TestRunner.DeleteAllFilesAsync();
     }
 }

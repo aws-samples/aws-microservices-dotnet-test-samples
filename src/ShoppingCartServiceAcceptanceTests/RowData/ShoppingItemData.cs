@@ -1,3 +1,3 @@
 namespace ShoppingCartServiceAcceptanceTests.RowData;
 
-public record ShoppingItemData(string id, string Name, double Price, uint Quantity);
+public record ShoppingItemData(string Id, string Name, double Price, uint Quantity);

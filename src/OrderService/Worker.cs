@@ -1,11 +1,15 @@
+using OrderService.BusinessLogic;
+
 namespace OrderService;
 
 public class Worker : BackgroundService
 {
+    private readonly OrderProcessingManager _orderProcessingManager;
     private readonly ILogger<Worker> _logger;
 
-    public Worker(ILogger<Worker> logger)
+    public Worker(OrderProcessingManager orderProcessingManager, ILogger<Worker> logger)
     {
+        _orderProcessingManager = orderProcessingManager;
         _logger = logger;
     }
 
@@ -13,8 +17,8 @@ public class Worker : BackgroundService
     {
         while (!stoppingToken.IsCancellationRequested)
         {
-            _logger.LogInformation("Worker running at: {Time}", DateTimeOffset.Now);
-            await Task.Delay(1000, stoppingToken);
+            await _orderProcessingManager.ProcessNextMessage();
+            await Task.Delay(10, stoppingToken);
         }
     }
 }

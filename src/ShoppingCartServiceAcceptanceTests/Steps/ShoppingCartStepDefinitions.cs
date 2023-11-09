@@ -1,5 +1,6 @@
 using System.Net;
 using Amazon.SQS;
+using Common.InventoryServiceFakeServer;
 using Common.TestUtils.Extensions;
 using InventoryService.Contracts.Models;
 using NUnit.Framework;
@@ -40,7 +41,7 @@ public class ShoppingCartStepDefinitions
     [Given(@"the following items exist in inventory:")]
     public void GivenTheFollowingItemsExistInInventory(IEnumerable<ShoppingItemData> items)
     {
-        var products = items.Select(i => new ProductDto(i.id, i.Name, i.Price, i.Quantity));
+        var products = items.Select(i => new ProductDto(i.Id, i.Name, i.Price, i.Quantity));
         _inventoryServiceDriver.AddProducts(products);
     }
 
