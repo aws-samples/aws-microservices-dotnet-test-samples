@@ -10,7 +10,7 @@ The application is built out of three microservices:
 ![Micro service architecture using .NET web API and AWS services](./media/dotnet-microservice-test-sample.png)
 
 ## Project Structure
-The solution is split into multiple projects, each service has it's source code, unit and integration tests and service level acceptance tests.
+The solution is split into multiple projects, each service has it's source code, unit/integration tests and service level acceptance tests.
 
 ### Inventory
 - [InventoryService](./src/InventoryService/) - Inventory service source code
